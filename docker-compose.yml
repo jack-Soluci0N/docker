@@ -1,22 +1,25 @@
-version: '2'
+version: '3'
 services:
-  postgresql:
-    image: 'docker.io/bitnami/postgresql:11-debian-10'
-    environment:
-      - ALLOW_EMPTY_PASSWORD=yes
-    volumes:
-      - 'postgresql_data:/bitnami/postgresql'
-  odoo:
-    image: 'docker.io/jacksoluci0n/odooo:14.0'
-    ports:
-      - '80:8069'
-      - '443:8071'
-    volumes:
-      - 'odoo_data:/bitnami'
+  web:
+    image: jacksoluci0n/odooo:14.0
     depends_on:
-      - postgresql
+      - db
+    ports:
+      - "80:8069"
+      - "447:8071"
+    volumes:
+      - odoo-web-data:/var/lib/odoo
+      - /srv/odoo/config:/etc/odoo
+      - /srv/odoo/addons:/mnt/extra-addons
+  db:
+    image: postgres:latest
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_PASSWORD=odoo
+      - POSTGRES_USER=odoo
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - odoo-db-data:/var/lib/postgresql/data
 volumes:
-  postgresql_data:
-    driver: local
-  odoo_data:
-    driver: local
+  odoo-web-data:
+  odoo-db-data:
